@@ -1,9 +1,46 @@
 using System.Net;
 using System.Net.Http.Headers;
 using System.Net.Http.Json;
+using System.Text;
 using System.Text.Json;
 
 namespace AlphaInfo;
+
+/// <summary>
+/// snake_case naming policy. .NET 8 ships
+/// <c>JsonNamingPolicy.SnakeCaseLower</c>, but we also target .NET 6,
+/// which does not. Implementing our own keeps the package on a single
+/// codepath across target frameworks.
+/// </summary>
+internal sealed class SnakeCaseLowerPolicy : JsonNamingPolicy
+{
+    public static readonly SnakeCaseLowerPolicy Instance = new();
+
+    public override string ConvertName(string name)
+    {
+        if (string.IsNullOrEmpty(name)) return name;
+        var sb = new StringBuilder(name.Length + 4);
+        for (int i = 0; i < name.Length; i++)
+        {
+            char c = name[i];
+            if (char.IsUpper(c))
+            {
+                bool prevIsLower = i > 0 && char.IsLower(name[i - 1]);
+                bool nextIsLower = i + 1 < name.Length && char.IsLower(name[i + 1]);
+                if (i > 0 && (prevIsLower || nextIsLower))
+                {
+                    sb.Append('_');
+                }
+                sb.Append(char.ToLowerInvariant(c));
+            }
+            else
+            {
+                sb.Append(c);
+            }
+        }
+        return sb.ToString();
+    }
+}
 
 /// <summary>
 /// Async client for the alphainfo.io Structural Intelligence API.
@@ -46,7 +83,7 @@ public sealed class AlphaInfoClient : IDisposable
         _ownsHttpClient = httpClient is null;
         _jsonOptions = new JsonSerializerOptions
         {
-            PropertyNamingPolicy = JsonNamingPolicy.SnakeCaseLower,
+            PropertyNamingPolicy = SnakeCaseLowerPolicy.Instance,
             PropertyNameCaseInsensitive = true,
             DefaultIgnoreCondition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull,
         };
