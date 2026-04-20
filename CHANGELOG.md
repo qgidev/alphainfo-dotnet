@@ -1,5 +1,22 @@
 # Changelog
 
+## [1.5.12] - 2026-04-20
+
+Added automatic domain inference; `AnalyzeRequest.Domain` now optional
+with sensible default.
+
+- New `DomainInference` class (Inferred, Confidence, FallbackUsed,
+  Reasoning).
+- `AnalysisResult.DomainApplied` — populated by server 1.5.12+.
+- `AnalysisResult.DomainInference` — populated only when the caller
+  set `req.Domain = "auto"`.
+- New `client.AnalyzeAutoAsync(req)` helper — sugar for
+  `AnalyzeAsync(req)` with `req.Domain = "auto"`.
+- XML doc on `AnalyzeAsync` explains "auto", aliases (`"fintech"`,
+  `"biomed"`, …) and the server's "Did you mean …?" typo path.
+
+Backwards-compatible.
+
 ## [1.5.11] - 2026-04-20
 
 Connection cleanup improvements.

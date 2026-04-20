@@ -26,6 +26,33 @@ public sealed class AnalysisResult
     [JsonPropertyName("provenance")] public Dictionary<string, object?>? Provenance { get; set; }
     [JsonPropertyName("semantic")] public SemanticResult? Semantic { get; set; }
     [JsonPropertyName("warning")] public string? Warning { get; set; }
+
+    /// <summary>
+    /// Always populated by server 1.5.12+. The calibration actually applied
+    /// (even when the caller omitted the <c>domain</c> field or passed
+    /// <c>"auto"</c>).
+    /// </summary>
+    [JsonPropertyName("domain_applied")] public string? DomainApplied { get; set; }
+
+    /// <summary>
+    /// Populated only when the caller passed <c>domain="auto"</c>. Carries
+    /// the inferred calibration name, a [0,1] confidence, a fallback flag
+    /// and a machine-readable reasoning tag.
+    /// </summary>
+    [JsonPropertyName("domain_inference")] public DomainInference? DomainInference { get; set; }
+}
+
+/// <summary>
+/// Inference block returned by <c>/v1/analyze/stream</c> when the caller
+/// passed <c>domain="auto"</c>. Null on the <see cref="AnalysisResult"/>
+/// for any other <c>domain</c> value.
+/// </summary>
+public sealed class DomainInference
+{
+    [JsonPropertyName("inferred")] public string Inferred { get; set; } = "";
+    [JsonPropertyName("confidence")] public double Confidence { get; set; }
+    [JsonPropertyName("fallback_used")] public bool FallbackUsed { get; set; }
+    [JsonPropertyName("reasoning")] public string Reasoning { get; set; } = "";
 }
 
 /// <summary>

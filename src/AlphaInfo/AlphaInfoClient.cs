@@ -159,12 +159,38 @@ public sealed class AlphaInfoClient : IDisposable, IAsyncDisposable
     // analyze / fingerprint
     // ------------------------------------------------------------------
 
+    /// <summary>
+    /// Run a full structural analysis on a single signal.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <c>req.Domain</c> is optional (defaults to <c>"generic"</c>). Pass
+    /// <c>"auto"</c> to have the server infer the calibration from the signal
+    /// — then read <see cref="AnalysisResult.DomainApplied"/> and
+    /// <see cref="AnalysisResult.DomainInference"/>. Or pass a specific name
+    /// (<c>"biomedical"</c>, <c>"finance"</c>, …). Aliases like <c>"fintech"</c>
+    /// and <c>"biomed"</c> resolve server-side; real typos receive HTTP 400
+    /// with a "Did you mean …?" suggestion.
+    /// </para>
+    /// </remarks>
     public async Task<AnalysisResult> AnalyzeAsync(AnalyzeRequest req, CancellationToken ct = default)
     {
         var body = BuildAnalyzeBody(req);
         var json = await PostAsync("/v1/analyze/stream", body, ct);
         return JsonSerializer.Deserialize<AnalysisResult>(json, _jsonOptions)
                ?? throw new ApiException("failed to parse analysis", 0);
+    }
+
+    /// <summary>
+    /// Syntactic sugar for <see cref="AnalyzeAsync"/> with
+    /// <c>req.Domain = "auto"</c>. The server picks the best calibration from
+    /// cheap signal statistics; inspect
+    /// <see cref="AnalysisResult.DomainInference"/> for confidence + reasoning.
+    /// </summary>
+    public Task<AnalysisResult> AnalyzeAutoAsync(AnalyzeRequest req, CancellationToken ct = default)
+    {
+        req.Domain = "auto";
+        return AnalyzeAsync(req, ct);
     }
 
     public async Task<FingerprintResult> FingerprintAsync(AnalyzeRequest req, CancellationToken ct = default)
