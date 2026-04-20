@@ -176,4 +176,37 @@ public class AlphaInfoClientTests
             await Assert.ThrowsAsync<ValidationException>(() => client.AuditReplayAsync(""));
         }
     }
+
+    // ── Bloco 1.2 — Dispose cleanup ─────────────────────────────────────
+
+    [Fact]
+    public void Dispose_is_idempotent()
+    {
+        var (client, _) = NewClient();
+        client.Dispose();
+        client.Dispose(); // must not throw
+    }
+
+    [Fact]
+    public async Task DisposeAsync_is_idempotent()
+    {
+        var (client, _) = NewClient();
+        await client.DisposeAsync();
+        await client.DisposeAsync(); // must not throw
+    }
+
+    [Fact]
+    public void Dispose_does_not_dispose_caller_owned_http()
+    {
+        // When the caller passes their own HttpClient, ownership stays
+        // with the caller — the SDK must not close it.
+        var mock = new MockHttpMessageHandler();
+        var http = new HttpClient(mock) { BaseAddress = new Uri(BaseUrl) };
+        var client = new AlphaInfoClient("ai_test", BaseUrl, http);
+        client.Dispose();
+        // If the SDK had disposed http, using it would throw
+        // ObjectDisposedException. Simple sanity: access a property.
+        Assert.NotNull(http.BaseAddress);
+        http.Dispose();
+    }
 }

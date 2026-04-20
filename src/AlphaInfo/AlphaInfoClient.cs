@@ -57,7 +57,7 @@ internal sealed class SnakeCaseLowerPolicy : JsonNamingPolicy
 /// pass your own via the <paramref name="httpClient"/> constructor arg if
 /// you want to share a pool across the application.
 /// </summary>
-public sealed class AlphaInfoClient : IDisposable
+public sealed class AlphaInfoClient : IDisposable, IAsyncDisposable
 {
     private const string DefaultBaseUrl = "https://www.alphainfo.io";
     private static readonly TimeSpan DefaultTimeout = TimeSpan.FromSeconds(150);
@@ -67,6 +67,7 @@ public sealed class AlphaInfoClient : IDisposable
     private readonly HttpClient _http;
     private readonly bool _ownsHttpClient;
     private readonly JsonSerializerOptions _jsonOptions;
+    private bool _disposed;
 
     public RateLimitInfo? RateLimitInfo { get; private set; }
 
@@ -89,9 +90,31 @@ public sealed class AlphaInfoClient : IDisposable
         };
     }
 
+    /// <summary>
+    /// Release the owned <see cref="HttpClient"/> (if any). Idempotent;
+    /// safe to call from <c>using</c> or <c>finally</c> blocks. When the
+    /// caller passed their own <see cref="HttpClient"/> via the
+    /// constructor, this is a no-op — ownership stays with the caller.
+    /// </summary>
     public void Dispose()
     {
-        if (_ownsHttpClient) _http.Dispose();
+        if (_disposed) return;
+        _disposed = true;
+        if (_ownsHttpClient)
+        {
+            try { _http.Dispose(); } catch { /* defensive — never throw from Dispose */ }
+        }
+    }
+
+    /// <summary>
+    /// Async-disposable entry point for C# 8.0+ <c>await using</c>. Calls
+    /// <see cref="Dispose"/> synchronously (HttpClient has no async
+    /// disposal on the .NET target this SDK supports).
+    /// </summary>
+    public ValueTask DisposeAsync()
+    {
+        Dispose();
+        return default;
     }
 
     // ------------------------------------------------------------------

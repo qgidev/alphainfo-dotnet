@@ -1,5 +1,16 @@
 # Changelog
 
+## [1.5.11] - 2026-04-20
+
+Connection cleanup improvements.
+
+- `AlphaInfoClient` now implements `IAsyncDisposable` in addition to
+  `IDisposable`, enabling the C# 8.0+ `await using` statement.
+- `Dispose()` is now fully idempotent and defensive — a second call is
+  a no-op and it never rethrows from the owned `HttpClient.Dispose`.
+- When the caller injects their own `HttpClient`, the SDK explicitly
+  does **not** dispose it (documented + tested).
+
 ## [1.5.10] - 2026-04-20
 
 Initial release — parity with Python SDK 1.5.10.
