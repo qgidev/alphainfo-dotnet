@@ -1,0 +1,31 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net6.0</TargetFramework>
+    <LangVersion>10</LangVersion>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <NoWarn>1591</NoWarn>
+
+    <!-- NuGet package metadata -->
+    <PackageId>AlphaInfo.Client</PackageId>
+    <Version>1.5.10</Version>
+    <Authors>QGI Quantum Systems LTDA</Authors>
+    <Company>QGI Quantum Systems LTDA</Company>
+    <Description>Official .NET client for the alphainfo.io Structural Intelligence API — detect regime changes in any time series.</Description>
+    <PackageTags>alphainfo;time-series;regime-detection;structural-analysis;anomaly-detection</PackageTags>
+    <PackageProjectUrl>https://alphainfo.io</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/qgidev/alphainfo-dotnet</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <Copyright>Copyright © QGI Quantum Systems LTDA</Copyright>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="..\..\README.md" Pack="true" PackagePath="\" />
+  </ItemGroup>
+
+</Project>
