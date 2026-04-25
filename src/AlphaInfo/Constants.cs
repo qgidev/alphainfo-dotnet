@@ -24,5 +24,5 @@ public static class AlphaInfoConstants
     /// <summary>
     /// SDK version string used in the <c>User-Agent</c> header.
     /// </summary>
-    public const string SdkVersion = "1.5.20";
+    public const string SdkVersion = "1.5.21";
 }
