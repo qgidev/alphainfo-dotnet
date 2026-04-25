@@ -11,7 +11,7 @@
 
     <!-- NuGet package metadata -->
     <PackageId>AlphaInfo.Client</PackageId>
-    <Version>1.5.21</Version>
+    <Version>1.5.22</Version>
     <Authors>QGI Quantum Systems LTDA</Authors>
     <Company>QGI Quantum Systems LTDA</Company>
     <Description>Official .NET client for the alphainfo.io Structural Intelligence API — detect regime changes in any time series.</Description>
